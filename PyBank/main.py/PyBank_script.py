@@ -1,48 +1,64 @@
-import os
 import csv
 
-# Step 1: Read the CSV File
-file = "../Resources/budget_data.csv"
-with open('budget_data.csv', 'r') as file:
-    reader = csv.reader(file)
-    next(reader)  # Skip header row if present
-    data = list(reader)
+# Define the file path
+file_path = r"C:\Users\eaalv\Bootcamp\python-challenge\PyBank\Resources\budget_data.csv"
 
-# Step 2: Initialize Variables
+# Initialize variables
 total_months = 0
 net_total = 0
-prev_month_profit = int(data[0][1])  # Assuming data is sorted by date
-monthly_changes = []
-greatest_increase = ["", 0]
-greatest_decrease = ["", 0]
+previous_profit_loss = 0
+profit_loss_changes = []
+dates = []
 
-# Step 3-7: Loop Through the Data and Perform Calculations
-for row in data:
-    # Step 4: Calculate Total Number of Months and Net Total
-    total_months += 1
-    net_total += int(row[1])
+# Read the CSV file
+with open(file_path, newline='') as csvfile:
+    csvreader = csv.reader(csvfile, delimiter=',')
+    
+    # Read the header row
+    header = next(csvreader)
+    
+    for row in csvreader:
+        # Count total months
+        total_months += 1
+        
+        # Calculate net total profit/loss
+        net_total += int(row[1])
+        
+        # Calculate change in profit/loss and store in list
+        change = int(row[1]) - previous_profit_loss
+        profit_loss_changes.append(change)
+        
+        # Store the date
+        dates.append(row[0])
+        
+        # Update previous profit/loss for the next iteration
+        previous_profit_loss = int(row[1])
 
-    # Step 5: Calculate Monthly Changes
-    monthly_change = int(row[1]) - prev_month_profit
-    monthly_changes.append(monthly_change)
-    prev_month_profit = int(row[1])
+# Calculate average change
+average_change = round(sum(profit_loss_changes[1:]) / (total_months - 1), 2)
 
-    # Step 8: Find Greatest Increase and Decrease
-    if monthly_change > greatest_increase[1]:
-        greatest_increase[0] = row[0]
-        greatest_increase[1] = monthly_change
-    if monthly_change < greatest_decrease[1]:
-        greatest_decrease[0] = row[0]
-        greatest_decrease[1] = monthly_change
+# Find the greatest increase and decrease in profits
+greatest_increase = max(profit_loss_changes)
+greatest_increase_date = dates[profit_loss_changes.index(greatest_increase)]
+greatest_decrease = min(profit_loss_changes)
+greatest_decrease_date = dates[profit_loss_changes.index(greatest_decrease)]
 
-# Step 6: Calculate Average Change
-average_change = sum(monthly_changes) / len(monthly_changes)
-
-# Step 8: Print the Results
+# Print results to the terminal
 print("Financial Analysis")
-print("------------------")
+print("----------------------------")
 print(f"Total Months: {total_months}")
 print(f"Total: ${net_total}")
-print(f"Average Change: ${average_change:.2f}")
-print(f"Greatest Increase in Profits: {greatest_increase[0]} (${greatest_increase[1]})")
-print(f"Greatest Decrease in Profits: {greatest_decrease[0]} (${greatest_decrease[1]})")
+print(f"Average Change: ${average_change}")
+print(f"Greatest Increase in Profits: {greatest_increase_date} (${greatest_increase})")
+print(f"Greatest Decrease in Profits: {greatest_decrease_date} (${greatest_decrease})")
+
+# Export results to a text file
+output_file_path = r"C:\Users\eaalv\Bootcamp\python-challenge\PyBank\analysis\financial_analysis.txt"
+with open(output_file_path, 'w') as output_file:
+    output_file.write("Financial Analysis\n")
+    output_file.write("----------------------------\n")
+    output_file.write(f"Total Months: {total_months}\n")
+    output_file.write(f"Total: ${net_total}\n")
+    output_file.write(f"Average Change: ${average_change}\n")
+    output_file.write(f"Greatest Increase in Profits: {greatest_increase_date} (${greatest_increase})\n")
+    output_file.write(f"Greatest Decrease in Profits: {greatest_decrease_date} (${greatest_decrease})")

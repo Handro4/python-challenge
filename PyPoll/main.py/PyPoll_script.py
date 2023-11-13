@@ -1,54 +1,65 @@
-import os
 import csv
-csvpath = os.path.join("..", "Resources", "election_data.csv")
 
-# Step 1: Read the CSV File
-with open(csvpath) as csvfile:
-    reader = csv.DictReader(csvfile)
-    data = list(reader)
+# Filepath
+file_path = r"C:\Users\eaalv\Bootcamp\python-challenge\PyPoll\Resources\election_data.csv"
 
-# Step 2: Initialize Variables
-total_votes = len(data)
+# Variables
+total_votes = 0
 candidates = {}
 winner = ""
-max_votes = 0
+winner_votes = 0
 
-# Step 3-4: Loop Through the Data and Perform Calculations
-for row in data:
-    candidate = row['Candidate']
-    if candidate not in candidates:
-        candidates[candidate] = 1
-    else:
-        candidates[candidate] += 1
+# Read in the CSV file
+with open(file_path, newline='') as csvfile:
+    csvreader = csv.reader(csvfile, delimiter=',')
+    
+    # Read the header row
+    header = next(csvreader)
+    
+    for row in csvreader:
+        # Count total votes
+        total_votes += 1
+        
+        # Track candidate votes
+        candidate = row[2]
+        if candidate not in candidates:
+            candidates[candidate] = 1
+        else:
+            candidates[candidate] += 1
 
-    if candidates[candidate] > max_votes:
-        max_votes = candidates[candidate]
-        winner = candidate
-
-# Step 5: Calculate Vote Percentages
-percentages = {candidate: (votes / total_votes) * 100 for candidate, votes in candidates.items()}
-
-# Step 6: Print the Results
+# Print results to the terminal
 print("Election Results")
 print("-------------------------")
 print(f"Total Votes: {total_votes}")
 print("-------------------------")
+
+# Calculate and print each candidate's total votes and percentage
 for candidate, votes in candidates.items():
-    print(f"{candidate}: {percentages[candidate]:.3f}% ({votes})")
+    percentage = round((votes / total_votes) * 100, 3)
+    print(f"{candidate}: {percentage}% ({votes})")
+    
+    # Determine the winner
+    if votes > winner_votes:
+        winner = candidate
+        winner_votes = votes
+
 print("-------------------------")
 print(f"Winner: {winner}")
 print("-------------------------")
 
-# Step 7: Export Results to a Text File
-with open('election_results.txt', 'w') as output_file:
+# Export results to a text file
+output_file_path = r"C:\Users\eaalv\Bootcamp\python-challenge\PyPoll\analysis\election_results.txt"
+with open(output_file_path, 'w') as output_file:
     output_file.write("Election Results\n")
     output_file.write("-------------------------\n")
     output_file.write(f"Total Votes: {total_votes}\n")
     output_file.write("-------------------------\n")
+
+    # Calculate and write each candidate's total votes and percentage
     for candidate, votes in candidates.items():
-        output_file.write(f"{candidate}: {percentages[candidate]:.3f}% ({votes})\n")
+        percentage = round((votes / total_votes) * 100, 3)
+        output_file.write(f"{candidate}: {percentage}% ({votes})\n")
+
     output_file.write("-------------------------\n")
     output_file.write(f"Winner: {winner}\n")
-    output_file.write("-------------------------\n")
-
-print("Results exported to 'election_results.txt'")
+    output_file.write("-------------------------")
