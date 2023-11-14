@@ -28,6 +28,7 @@ This was covered in 3.2 activites 10-Ins_WriteCSV homework
 
 
 PyPoll Script 
+
 #1 Import
 Standard step we did in python homework
 
